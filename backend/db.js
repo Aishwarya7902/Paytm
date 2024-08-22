@@ -9,9 +9,21 @@ const UserSchema = new mongoose.Schema({
     lastName:String,
     password: String
 });
+const accountSchema=new mongoose.Schema({
+    userId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'User',
+        required:true
+    },
+    balance:{
+        type:Number,
+        required:true
+    }
+})
 
 
 const User = mongoose.model('User', UserSchema);
+const Account=mongoose.model()
 
 module.exports = {
     User
