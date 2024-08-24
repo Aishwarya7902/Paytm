@@ -14,51 +14,49 @@ router.get("/balance",authMiddleware,async (req,res)=>{
 
 /************************************* Creating Endpoint To Transfer Money *******************/
 router.post("/transfer",authMiddleware,async (req,res)=>{
+    const session=await mongoose.startSession();
+    session.startTransaction();
+
     const {amount,to}=req.body;
-    //getting account of user
+ //getting account of user
     const account=await Account.findOne({
         userId:req.userId
-    });
-   // checking if user has sufficient balance or not
-    if(account.balance<amount){
+    }).session(session);
+     // checking if user has sufficient balance or not
+    if(!account || account.balance<amount){
+        await session.abortTransaction();
         return res.status(400).json({
-            message:"Insufficient Balance"
+            message:"Insufficient balance"
         })
     }
-
-    //getting account of person whom to send
-
+//getting account of person whom to send
     const toAccount=await Account.findOne({
         userId:to
-    });
-
-    // if this account is not valid
+    }).session(session);
+ // if this account is not valid
     if(!toAccount){
+        await session.abortTransaction();
         return res.status(400).json({
             message:"Invalid Account"
         })
     }
-
-    //debit amount from user
-
-    await account.updateOne({
-        userId:req.userId
-    },{
+ //debit amount from user
+    await account.updateOne({userId:req.userId},{
         $inc:{
             balance: -amount
         }
-    })
+    }).session(session)
+  // credit amount to Friend
 
-    // credit amount to Friend
-
-    await toAccount.updateOne({
-        userId:to
-    },{
+    await toAccount.updateOne({userId:to},{
         $inc:{
             balance: amount
         }
-    })
+    }).session(session)
 
+    //commit transaction
+
+    await session.commitTransaction();
     res.json({
         message:"Transfer Successful"
     })
