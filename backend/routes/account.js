@@ -1,7 +1,9 @@
 const express=require('express');
 const { authMiddleware } = require('../middleware');
 const { Account } = require('../db');
+const { default: mongoose } = require('mongoose');
 const router=express.Router();
+
 /*************************************Creating Endpoint For Getting Balance Of User *******************/
 router.get("/balance",authMiddleware,async (req,res)=>{
     const account=await Account.findOne({
@@ -41,14 +43,14 @@ router.post("/transfer",authMiddleware,async (req,res)=>{
         })
     }
  //debit amount from user
-    await account.updateOne({userId:req.userId},{
+    await Account.updateOne({userId:req.userId},{
         $inc:{
             balance: -amount
         }
     }).session(session)
   // credit amount to Friend
 
-    await toAccount.updateOne({userId:to},{
+    await Account.updateOne({userId:to},{
         $inc:{
             balance: amount
         }

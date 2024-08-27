@@ -1,6 +1,6 @@
 const express = require('express');
 const zod = require('zod');
-const { User } = require("../db");
+const { User,Account } = require("../db");
 const { JWT_SECRET } = require('../config');
 const jwt = require("jsonwebtoken");
 const {authMiddleware}=require('../middleware')
@@ -19,24 +19,37 @@ router.post("/signup", async (req, res) => {
     //zod validation
     const { success } = signupSchema.safeParse(req.body);
     if (!success) {
-        return res.json({
+        return res.status(411).json({
             message: "invalid inputs"
         })
     }
     //checking if user already exists in DB
-    const user = User.findOne({
-        username: body.username
+    const existingUser = await User.findOne({
+        username: req.body.username
     })
-    if (user._id) {
-        return res.json({
-            message: "Email already exists"
-        })
-    }
-    // if user does not already exist, put it in db
-    const dbUser = await User.create(body);
+    if (existingUser) {
+      return res.status(411).json({
+          message: "Email already taken/Incorrect inputs"
+      })
+  }
+
+  const user = await User.create({
+    username: req.body.username,
+    password: req.body.password,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+})
+    /*****************************Creating A New Account***************************/
+    const userId=user._id;
+    await Account.create({
+      userId,
+      balance:1+Math.random()*10000
+    })
+    /******************************************************************************************************/
+    
     // creating token for the user
     const token = jwt.sign({
-        userId: user._id
+        userId
     }, JWT_SECRET);
 
     res.json({
