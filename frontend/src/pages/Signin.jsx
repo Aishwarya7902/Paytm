@@ -12,7 +12,25 @@ import { useNavigate } from "react-router-dom";
 export const Signin = () => {
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate=useNavigate();
+  const handleSignin = async () => {
+    if (!username || !password) {
+      setErrorMessage("Email and Password are required.");
+      return;
+    }
+
+    try {
+      const response = await axios.post("https://paytm-1-0zk2.onrender.com/api/v1/user/signin", {
+        username,
+        password,
+      });
+      localStorage.setItem("token", response.data.token);
+      navigate("/dashboard");
+    } catch (error) {
+      setErrorMessage("Invalid credentials. Please try again.");
+    }
+  };
 
   return <div className="bg-slate-300 h-screen flex justify-center">
     <div className="flex flex-col justify-center">
@@ -35,16 +53,12 @@ export const Signin = () => {
             label={"Password"} 
          />
 
+        {errorMessage && (
+            <div className="text-red-500 text-sm mt-2">{errorMessage}</div>
+          )}
         <div className="pt-4">
           <Button
-            onClick={async ()=>{
-             const response=await axios.post("https://paytm-1-0zk2.onrender.com/api/v1/user/signin",{
-                  username,
-                  password
-              });
-              localStorage.setItem("token",response.data.token)
-              navigate("/dashboard")
-            }} 
+            onClick={handleSignin} 
             label={"Sign in"}  
           />
         </div>

@@ -3,15 +3,27 @@ import { useEffect, useState } from "react";
 import { Button } from "./Button"
 import axios from "axios"
 import { useNavigate } from "react-router-dom";
+import {jwtDecode} from "jwt-decode";
 export const Users = () => {
     const [users,setUsers]=useState([]);
     const [filter,setFilter]=useState("")
 
     useEffect(()=>{
+        const token = localStorage.getItem("token");
+        let loggedInUserId = "";
+
+        if (token) {
+            const decodedToken = jwtDecode(token);
+            loggedInUserId = decodedToken.userId; // Assuming userId is part of the token payload
+        }
      axios.get("https://paytm-1-0zk2.onrender.com/api/v1/user/bulk?filter=" + filter)
      .then(response=>{
-      setUsers(response.data.user)
+      const filteredUsers = response.data.user.filter(user => user._id !== loggedInUserId);
+      setUsers(filteredUsers)
      })
+     .catch(error => {
+        console.error("Error fetching users:", error);
+    })
     },[filter])
 
     return <>
