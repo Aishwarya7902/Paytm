@@ -14,8 +14,28 @@ export const Signup = () => {
     const [lastName, setLastName] = useState("");
     const [username, setUserName] = useState("");
     const [password, setPassword] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
     const navigate=useNavigate()
-
+    const handleSignup = async () => {
+        if (!username || !password || !lastName ||!firstName) {
+          setErrorMessage("Something went wrong. Please try again.");
+          return;
+        }
+    
+        try {
+          const response = await axios.post("https://paytm-1-0zk2.onrender.com/api/v1/user/signup", {
+                            username,
+                            firstName,
+                            lastName,
+                            password
+          });
+          localStorage.setItem("token", response.data.token);
+          navigate("/dashboard");
+        } catch (error) {
+          setErrorMessage("Something went wrong. Please try again.");
+        }
+      };
+    
 
     return <div className="bg-slate-300 h-screen flex justify-center">
         <div className="flex flex-col justify-center">
@@ -50,19 +70,13 @@ export const Signup = () => {
                     placeHolder="123456" 
                     label={"Password"} 
                 />
-
+                
+                {errorMessage && (
+            <div className="text-red-500 text-sm mt-2">{errorMessage}</div>
+          )}
                 <div className="pt-4">
                     <Button 
-                    onClick={async()=>{
-                       const response=await axios.post("https://paytm-1-0zk2.onrender.com/api/v1/user/signup",{
-                            username,
-                            firstName,
-                            lastName,
-                            password
-                        });
-                        localStorage.setItem("token",response.data.token)
-                        navigate("/dashboard")
-                    }}
+                    onClick={handleSignup}
                     label={"Signup"} 
                     />
                 </div>
