@@ -44,6 +44,7 @@ export const Signup = () => {
                 <SubHeading label={"Enter your information to create your account"} />
 
                 <InputBox 
+                    type="text" 
                     onChange={(e) => {
                     setFirstName(e.target.value)}} 
                     placeHolder="John" 
@@ -51,13 +52,15 @@ export const Signup = () => {
                />
 
                 <InputBox 
+                    type="text" 
                     onChange={(e) => {
                     setLastName(e.target.value)}} 
                     placeHolder="Doe" 
                     label={"Last Name"} 
                 />
 
-                <InputBox 
+                <InputBox
+                    type="email"  
                     onChange={(e) => {
                     setUserName(e.target.value)}} 
                     placeHolder="aish123@gmail.com" 
@@ -65,6 +68,7 @@ export const Signup = () => {
                 />
 
                 <InputBox 
+                    type="password" 
                     onChange={(e) => {
                     setPassword(e.target.value)}} 
                     placeHolder="123456" 

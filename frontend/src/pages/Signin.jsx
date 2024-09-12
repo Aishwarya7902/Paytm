@@ -39,6 +39,7 @@ export const Signin = () => {
         <SubHeading label={"Enter your credentials to access your account"} />
 
         <InputBox 
+            type="email" 
             onChange={(e) => {
             setUserName(e.target.value)}} 
             placeHolder="aish123@gmail.com" 
@@ -46,6 +47,7 @@ export const Signin = () => {
         />
 
         <InputBox
+            type="password" 
             onChange={(e) => {
               setPassword(e.target.value)
             }}  
